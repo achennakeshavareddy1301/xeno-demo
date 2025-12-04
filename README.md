@@ -282,38 +282,36 @@ vercel deploy
 3. Deploy
 
 ## 📝 Known Limitations
+**1. Assumptions**
+Business Assumptions
+Multi-tenant SaaS Model: Each Shopify store operates as an independent tenant with completely isolated data. This ensures data privacy.
+Store Admin Access: Users registering are assumed to have admin access to their Shopify store to generate API access tokens.
+Data Sync Frequency: Manual sync is sufficient for the MVP. Users can trigger data synchronization on-demand.
+Single Currency: The initial implementation assumes single currency per store.
+**Technical Assumptions**
+Shopify REST API: Using version 2024-01 for wider compatibility.
+PostgreSQL Database: Chosen for ACID compliance, JSON support, and scalability.
+JWT Authentication: Stateless JWT-based authentication is used for the distributed architecture.
+Development Store Limitations: Note that Shopify development stores redact customer PII (name, email) in API responses.
+**Data Assumptions**
+Draft Orders as Orders: Draft orders are treated as valid orders for revenue calculation.
+Customer Spend Calculation: Calculated by summing order totals linked to each customer.
+Product Inventory: Uses the first variant's inventory quantity when multiple variants exist.
 
-- Shopify API rate limits (2 requests/second for standard plan)
-- Webhook signature verification disabled in development
-- No real-time sync - scheduled every 6 hours (configurable)
-- Single database connection pool
 
 ## 🔮 Next Steps to Productionize
+**Phase 1: Security and Reliability (2-4 weeks)**
+Rate Limiting: Implement express-rate-limit.
+Input Validation: specific schemas using Zod/Joi.
+**Phase 2: Performance and Scalability (1-2 months)**
+Caching Layer: Redis for dashboard stats.
+Background Jobs: BullMQ for async sync operations.
+Webhooks: Replace polling with Shopify Webhooks.
+**Phase 3: AI-Powered Features (2-3 months)**
+RFM Analysis: Auto-segmentation (Champions, At Risk).
+Churn Prediction: ML models for retention.
+Smart Alerts: Anomaly detection for orders/inventory.
 
-1. **Security**
-   - Enable webhook signature verification
-   - Implement rate limiting
-   - Add CORS restrictions
-   - Use HTTPS everywhere
-
-2. **Scalability**
-   - Add Redis for caching
-   - Implement message queues (RabbitMQ/SQS) for async processing
-   - Database connection pooling
-   - Horizontal scaling with load balancer
-
-3. **Monitoring**
-   - Add logging (Winston/Pino)
-   - Set up error tracking (Sentry)
-   - Performance monitoring (New Relic/DataDog)
-   - Health check endpoints
-
-4. **Features**
-   - Real-time updates with WebSockets
-   - Export data to CSV/Excel
-   - Email notifications
-   - Custom event tracking (cart abandoned, etc.)
-   - Multi-currency support
 
 ## 📄 License
 
