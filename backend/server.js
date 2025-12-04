@@ -1,4 +1,4 @@
-require('dotenv').config({ path: '../.env' });
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
@@ -14,11 +14,23 @@ const productsRoutes = require('./routes/products');
 const webhooksRoutes = require('./routes/webhooks');
 
 const app = express();
-const PORT = process.env.BACKEND_PORT || 5000;
+const PORT = process.env.PORT || process.env.BACKEND_PORT || 5000;
 
-// Middleware
+// CORS configuration for production
+const allowedOrigins = [
+  'http://localhost:3000',
+  process.env.FRONTEND_URL,
+].filter(Boolean);
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: function(origin, callback) {
+    // Allow requests with no origin (mobile apps, curl, etc)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.some(allowed => origin.startsWith(allowed.replace(/\/$/, '')))) {
+      return callback(null, true);
+    }
+    return callback(null, true); // Allow all for now
+  },
   credentials: true,
 }));
 
